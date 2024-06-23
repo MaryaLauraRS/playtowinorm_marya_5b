@@ -1,10 +1,15 @@
 require("dotenv").config();
 const conn = require("./db/conn");
+const express = require("express");
+const exphbs = require("express-handlebars");
 
 const Usuario = require("./models/Usuario");
 const Jogo = require("./models/Jogo");
-const express = require("express");
-const exphbs = require("express-handlebars");
+const Cartao = require("./models/Cartao");
+const Conquista = require("./models/Conquistas");
+
+Jogo.belongsToMany(Usuario, { through: "aquisicoes" });
+Usuario.belongsToMany(Jogo, { through: "aquisicoes" });
 
 const app = express();
 
@@ -179,6 +184,77 @@ app.post("/jogos/:id/delete", async (req, res) => {
         res.send("Erro ao deletar o jogo");
     }
 });
+
+//cartão
+
+app.get("/usuarios/:id/cartoes", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const usuario = await Usuario.findByPk(id, { raw: true });
+  
+    const cartoes = await Cartao.findAll({
+      raw: true,
+      where: { UsuarioId: id },
+    });
+  
+    res.render("cartoes.handlebars", { usuario, cartoes });
+  });
+
+  app.get("/usuarios/:id/novoCartao", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const usuario = await Usuario.findByPk(id, { raw: true });
+  
+    res.render("formCartao", { usuario });
+  });
+
+  app.post("/usuarios/:id/novoCartao", async (req, res) => {
+    const id = parseInt(req.params.id);
+  
+    const dadosCartao = {
+      numero: req.body.numero,
+      nome: req.body.nome,
+      codSeguranca: req.body.codSeguranca,
+      UsuarioId: id,
+    };
+  
+    await Cartao.create(dadosCartao);
+  
+    res.redirect(`/usuarios/${id}/cartoes`);
+  });
+
+  //conquistas
+
+  app.get("/jogos/:id/conquistas", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const jogo = await Jogo.findByPk(id, { raw: true });
+  
+    const conquistas = await Conquista.findAll({
+      raw: true,
+      where: { JogoId: id },
+    });
+  
+    res.render("conquista.handlebars", { jogo, conquistas });
+  });
+
+  app.get("/jogos/:id/novoConquista", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const jogo = await Jogo.findByPk(id, { raw: true });
+  
+    res.render("formConquista", { jogo });
+  });
+
+  app.post("/jogos/:id/novoConquista", async (req, res) => {
+    const id = parseInt(req.params.id);
+  
+    const dadosConquista = {
+        titulo: req.body.titulo,
+        descricao: req.body.descricao,
+      JogoId: id,
+    };
+  
+    await  Conquista.create(dadosConquista);
+  
+    res.redirect(`/jogo/${id}/conquista`);
+  });
 
 app.listen(8000);
 

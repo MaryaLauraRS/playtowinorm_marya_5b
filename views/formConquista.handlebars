@@ -1,0 +1,15 @@
+<h1> Cadastrar Conquista</h1>
+<form action="/jogos/{{jogo.id}}/novoConquistas" method="post">
+
+   <div>
+        <label for="titulo">título:</label>
+        <input type="text" id="titulo" name="titulo" value="{{conquista.titulo}}"/>
+      </div>
+      <div>
+        <label for="descricao">descrição:</label>
+        <input type="text" id="descricao" name="descricao" value="{{conquista.descricao}}"/>
+      </div>
+
+  <input type="submit" value="Cadastrar" />
+
+</form>
