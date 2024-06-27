@@ -232,6 +232,7 @@ app.get("/usuarios/:id/cartoes", async (req, res) => {
       where: { JogoId: id },
     });
   
+    
     res.render("conquista.handlebars", { jogo, conquistas });
   });
 
@@ -248,18 +249,18 @@ app.get("/usuarios/:id/cartoes", async (req, res) => {
     const dadosConquista = {
         titulo: req.body.titulo,
         descricao: req.body.descricao,
-      JogoId: id,
+        JogoId: id,
     };
   
     await  Conquista.create(dadosConquista);
   
-    res.redirect(`/jogo/${id}/conquista`);
+    res.redirect(`/jogos/${id}/conquistas`);
   });
 
 app.listen(8000);
 
 conn
-    .sync()
+    .sync({force:true})
     .then( () => {
         console.log("Conectado e sincronizado!");
     }).catch( (err) => {
